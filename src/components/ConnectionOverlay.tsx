@@ -59,12 +59,12 @@ export const ConnectionOverlay = track(({ containerRef, arrowColor, arrowDash }:
   if (!activeDrag && !editingShapeId) {
     if (hoveredShapeId) {
       const shape = editor.getShape(hoveredShapeId);
-      if (shape && shape.type === 'geo') {
+      if (shape && (shape.type === 'geo' || shape.type === 'markdown')) {
         targetShapeId = hoveredShapeId;
       }
     } else if (selectedShapeIds.length === 1) {
       const shape = editor.getShape(selectedShapeIds[0]);
-      if (shape && shape.type === 'geo') {
+      if (shape && (shape.type === 'geo' || shape.type === 'markdown')) {
         targetShapeId = selectedShapeIds[0];
       }
     }
@@ -202,10 +202,10 @@ export const ConnectionOverlay = track(({ containerRef, arrowColor, arrowDash }:
         });
       }
 
-      // Check if hovering over another geo shape
+      // Check if hovering over another geo or markdown shape
       const target = editor.getShapeAtPoint(pagePoint, {
         hitInside: true,
-        filter: (shape) => shape.id !== currentDrag.startShapeId && shape.type === 'geo',
+        filter: (shape) => shape.id !== currentDrag.startShapeId && (shape.type === 'geo' || shape.type === 'markdown'),
       });
 
       if (target) {

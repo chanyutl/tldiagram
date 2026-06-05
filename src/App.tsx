@@ -3,6 +3,10 @@ import { Tldraw, Editor, createShapeId, createBindingId, toRichText } from 'tldr
 import 'tldraw/tldraw.css';
 import './App.css';
 import { ConnectionOverlay } from './components/ConnectionOverlay';
+import { MarkdownShapeUtil } from './components/MarkdownShapeUtil';
+
+const customShapeUtils = [MarkdownShapeUtil];
+
 
 interface Ripple {
   x: number;
@@ -334,7 +338,7 @@ function App() {
     return () => window.removeEventListener('pointerdown', handleClose);
   }, [contextMenu]);
 
-  const spawnShape = (type: 'rectangle' | 'circle' | 'text') => {
+  const spawnShape = (type: 'rectangle' | 'circle' | 'text' | 'markdown') => {
     if (!editor || !contextMenu) return;
     const shapeId = createShapeId();
     if (type === 'rectangle') {
@@ -376,6 +380,19 @@ function App() {
           color: arrowColor,
         } as any,
       });
+    } else if (type === 'markdown') {
+      editor.createShape({
+        id: shapeId,
+        type: 'markdown',
+        x: contextMenu.pageX - 200,
+        y: contextMenu.pageY - 150,
+        props: {
+          w: 400,
+          h: 300,
+          text: '# Markdown\nDouble click to edit.',
+          color: 'black',
+        } as any,
+      });
     }
     editor.select(shapeId);
     editor.setEditingShape(shapeId);
@@ -397,7 +414,7 @@ function App() {
           />
         ))}
 
-        <Tldraw onMount={handleMount}>
+        <Tldraw onMount={handleMount} shapeUtils={customShapeUtils}>
           {/* Pinpoint overlay handles */}
           <ConnectionOverlay
             containerRef={containerRef}
@@ -422,6 +439,16 @@ function App() {
           >
             <span>Add Block</span>
             <span className="shortcut">Rect</span>
+          </button>
+          <button
+            className="context-menu-item"
+            onClick={() => {
+              spawnShape('markdown');
+              setContextMenu(null);
+            }}
+          >
+            <span>Add Markdown</span>
+            <span className="shortcut">MD</span>
           </button>
           <button
             className="context-menu-item"
