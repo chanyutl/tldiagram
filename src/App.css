@@ -357,23 +357,23 @@ kbd {
 /* Floating Sleek Right-Click Context Menu */
 .custom-context-menu {
   position: fixed;
-  background: rgba(8, 9, 12, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 6px;
-  min-width: 170px;
+  background: rgba(13, 17, 23, 0.75);
+  backdrop-filter: blur(20px) saturate(190%);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 5px;
+  min-width: 160px;
   z-index: 2000;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-  animation: contextMenuFadeIn 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  animation: contextMenuFadeIn 0.12s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   pointer-events: auto;
 }
 
 @keyframes contextMenuFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(-4px);
+    transform: scale(0.97) translateY(-3px);
   }
   to {
     opacity: 1;
@@ -385,36 +385,65 @@ kbd {
   width: 100%;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: #e2e8f0;
   padding: 8px 12px;
   text-align: left;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  transition: all 0.15s ease;
+  transition: background 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s, transform 0.1s;
+}
+
+.context-menu-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.context-menu-icon {
+  color: #94a3b8;
+  transition: color 0.15s ease;
 }
 
 .context-menu-item:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+  transform: translateX(2px);
+}
+
+.context-menu-item:active {
+  transform: scale(0.98) translateX(2px);
+}
+
+.context-menu-item:hover .context-menu-icon {
+  color: #818cf8; /* indigo accent */
 }
 
 .context-menu-item .shortcut {
+  font-family: 'Space Mono', monospace;
   font-size: 9px;
-  color: #475569;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 1px 4px;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.15s ease;
+}
+
+.context-menu-item:hover .shortcut {
+  color: #94a3b8;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .context-menu-separator {
   height: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
   margin: 4px 6px;
 }
 

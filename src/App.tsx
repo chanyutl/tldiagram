@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Tldraw, Editor, createShapeId, createBindingId, toRichText } from 'tldraw';
+import { Tldraw, Editor, createShapeId, toRichText } from 'tldraw';
 import 'tldraw/tldraw.css';
 import './App.css';
 import { ConnectionOverlay } from './components/ConnectionOverlay';
@@ -136,200 +136,7 @@ function App() {
     editorInstance.focus();
   };
 
-  // Template Loader: Flowchart
-  const loadFlowchart = () => {
-    if (!editor) return;
-    editor.selectAll();
-    editor.deleteShapes(editor.getSelectedShapeIds());
 
-    const startId = createShapeId();
-    const processId = createShapeId();
-    const endId = createShapeId();
-
-    editor.createShapes([
-      {
-        id: startId,
-        type: 'geo',
-        x: 100,
-        y: 200,
-        props: { geo: 'rectangle', w: 120, h: 60, richText: toRichText('Start Process'), color: 'green' } as any,
-      },
-      {
-        id: processId,
-        type: 'geo',
-        x: 320,
-        y: 190,
-        props: { geo: 'rectangle', w: 160, h: 80, richText: toRichText('Analyze Request'), color: 'blue' } as any,
-      },
-      {
-        id: endId,
-        type: 'geo',
-        x: 580,
-        y: 200,
-        props: { geo: 'rectangle', w: 120, h: 60, richText: toRichText('Success End'), color: 'red' } as any,
-      },
-    ]);
-
-    // Connect Start to Process
-    const arrow1Id = createShapeId();
-    editor.createShape({
-      id: arrow1Id,
-      type: 'arrow',
-      x: 220,
-      y: 230,
-      props: {
-        start: { x: 0, y: 0 },
-        end: { x: 100, y: 0 },
-        color: arrowColor,
-        dash: arrowDash,
-      } as any,
-    });
-
-    editor.createBinding({
-      id: createBindingId(),
-      type: 'arrow',
-      fromId: arrow1Id,
-      toId: startId,
-      props: { terminal: 'start', normalizedAnchor: { x: 1, y: 0.5 }, isPrecise: true, isExact: false },
-    });
-
-    editor.createBinding({
-      id: createBindingId(),
-      type: 'arrow',
-      fromId: arrow1Id,
-      toId: processId,
-      props: { terminal: 'end', normalizedAnchor: { x: 0, y: 0.5 }, isPrecise: true, isExact: false },
-    });
-
-    // Connect Process to End
-    const arrow2Id = createShapeId();
-    editor.createShape({
-      id: arrow2Id,
-      type: 'arrow',
-      x: 480,
-      y: 230,
-      props: {
-        start: { x: 0, y: 0 },
-        end: { x: 100, y: 0 },
-        color: arrowColor,
-        dash: arrowDash,
-      } as any,
-    });
-
-    editor.createBinding({
-      id: createBindingId(),
-      type: 'arrow',
-      fromId: arrow2Id,
-      toId: processId,
-      props: { terminal: 'start', normalizedAnchor: { x: 1, y: 0.5 }, isPrecise: true, isExact: false },
-    });
-
-    editor.createBinding({
-      id: createBindingId(),
-      type: 'arrow',
-      fromId: arrow2Id,
-      toId: endId,
-      props: { terminal: 'end', normalizedAnchor: { x: 0, y: 0.5 }, isPrecise: true, isExact: false },
-    });
-
-    setTimeout(() => {
-      editor.zoomToFit();
-    }, 100);
-  };
-
-  // Template Loader: Mindmap
-  const loadMindmap = () => {
-    if (!editor) return;
-    editor.selectAll();
-    editor.deleteShapes(editor.getSelectedShapeIds());
-
-    const centerId = createShapeId();
-    const ideaAId = createShapeId();
-    const ideaBId = createShapeId();
-    const ideaCId = createShapeId();
-    const ideaDId = createShapeId();
-
-    editor.createShapes([
-      {
-        id: centerId,
-        type: 'geo',
-        x: 300,
-        y: 280,
-        props: { geo: 'rectangle', w: 160, h: 80, richText: toRichText('Product Strategy'), color: 'violet' } as any,
-      },
-      {
-        id: ideaAId,
-        type: 'geo',
-        x: 60,
-        y: 150,
-        props: { geo: 'rectangle', w: 130, h: 60, richText: toRichText('User Research'), color: 'blue' } as any,
-      },
-      {
-        id: ideaBId,
-        type: 'geo',
-        x: 60,
-        y: 410,
-        props: { geo: 'rectangle', w: 130, h: 60, richText: toRichText('Competitors'), color: 'grey' } as any,
-      },
-      {
-        id: ideaCId,
-        type: 'geo',
-        x: 570,
-        y: 150,
-        props: { geo: 'rectangle', w: 130, h: 60, richText: toRichText('Marketing Plan'), color: 'orange' } as any,
-      },
-      {
-        id: ideaDId,
-        type: 'geo',
-        x: 570,
-        y: 410,
-        props: { geo: 'rectangle', w: 130, h: 60, richText: toRichText('Launch Timeline'), color: 'green' } as any,
-      },
-    ]);
-
-    const bindings = [
-      { from: centerId, to: ideaAId, startAnchor: { x: 0, y: 0.25 }, endAnchor: { x: 1, y: 0.5 } },
-      { from: centerId, to: ideaBId, startAnchor: { x: 0, y: 0.75 }, endAnchor: { x: 1, y: 0.5 } },
-      { from: centerId, to: ideaCId, startAnchor: { x: 1, y: 0.25 }, endAnchor: { x: 0, y: 0.5 } },
-      { from: centerId, to: ideaDId, startAnchor: { x: 1, y: 0.75 }, endAnchor: { x: 0, y: 0.5 } },
-    ];
-
-    bindings.forEach((b) => {
-      const arrowId = createShapeId();
-      editor.createShape({
-        id: arrowId,
-        type: 'arrow',
-        x: 300,
-        y: 300,
-        props: {
-          start: { x: 0, y: 0 },
-          end: { x: 0, y: 0 },
-          color: arrowColor,
-          dash: arrowDash,
-        } as any,
-      });
-
-      editor.createBinding({
-        id: createBindingId(),
-        type: 'arrow',
-        fromId: arrowId,
-        toId: b.from,
-        props: { terminal: 'start', normalizedAnchor: b.startAnchor, isPrecise: true, isExact: false },
-      });
-
-      editor.createBinding({
-        id: createBindingId(),
-        type: 'arrow',
-        fromId: arrowId,
-        toId: b.to,
-        props: { terminal: 'end', normalizedAnchor: b.endAnchor, isPrecise: true, isExact: false },
-      });
-    });
-
-    setTimeout(() => {
-      editor.zoomToFit();
-    }, 100);
-  };
 
   useEffect(() => {
     if (!contextMenu) return;
@@ -437,7 +244,12 @@ function App() {
               setContextMenu(null);
             }}
           >
-            <span>Add Block</span>
+            <div className="context-menu-item-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="context-menu-icon">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+              </svg>
+              <span>Block</span>
+            </div>
             <span className="shortcut">Rect</span>
           </button>
           <button
@@ -447,18 +259,17 @@ function App() {
               setContextMenu(null);
             }}
           >
-            <span>Add Markdown</span>
+            <div className="context-menu-item-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="context-menu-icon">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <line x1="10" y1="9" x2="8" y2="9"/>
+              </svg>
+              <span>Markdown</span>
+            </div>
             <span className="shortcut">MD</span>
-          </button>
-          <button
-            className="context-menu-item"
-            onClick={() => {
-              spawnShape('circle');
-              setContextMenu(null);
-            }}
-          >
-            <span>Add Concept</span>
-            <span className="shortcut">Circle</span>
           </button>
           <button
             className="context-menu-item"
@@ -467,29 +278,15 @@ function App() {
               setContextMenu(null);
             }}
           >
-            <span>Add Label</span>
+            <div className="context-menu-item-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="context-menu-icon">
+                <polyline points="4 7 4 4 20 4 20 7"/>
+                <line x1="9" y1="20" x2="15" y2="20"/>
+                <line x1="12" y1="4" x2="12" y2="20"/>
+              </svg>
+              <span>Label</span>
+            </div>
             <span className="shortcut">Text</span>
-          </button>
-          <div className="context-menu-separator" />
-          <button
-            className="context-menu-item"
-            onClick={() => {
-              loadFlowchart();
-              setContextMenu(null);
-            }}
-          >
-            <span>Flowchart</span>
-            <span className="shortcut">➔</span>
-          </button>
-          <button
-            className="context-menu-item"
-            onClick={() => {
-              loadMindmap();
-              setContextMenu(null);
-            }}
-          >
-            <span>Mindmap</span>
-            <span className="shortcut">➔</span>
           </button>
         </div>
       )}
