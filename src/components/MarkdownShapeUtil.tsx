@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { 
   BaseBoxShapeUtil, 
   DefaultColorStyle, 
@@ -34,6 +35,96 @@ export type MarkdownShape = TLBaseBoxShape & {
   };
 };
 
+// React component handling internal card states and native event listeners
+function MarkdownCard({
+  shape,
+  editor,
+  isEditing,
+  isDarkMode,
+}: {
+  shape: MarkdownShape;
+  editor: any;
+  isEditing: boolean;
+  isDarkMode: boolean;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Resolve current theme colors based on tldraw theme configurations
+  const theme = DEFAULT_THEME.colors[isDarkMode ? 'dark' : 'light'];
+  const resolvedColor = theme[shape.props.color];
+
+  const textColor = isDarkMode ? '#f1f5f9' : '#0f172a';
+  const cardBg = resolvedColor.semi;
+  const cardBorder = resolvedColor.solid;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      const hasVerticalOverflow = el.scrollHeight > el.clientHeight;
+      const hasHorizontalOverflow = el.scrollWidth > el.clientWidth;
+      
+      // Stop native propagation to prevent Tldraw canvas zoom/pan when scrolling the block
+      if (hasVerticalOverflow || hasHorizontalOverflow || isEditing) {
+        e.stopPropagation();
+      }
+    };
+
+    // Listen natively to prevent React event delegation latency
+    el.addEventListener('wheel', handleWheel, { passive: true });
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+    };
+  }, [isEditing]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`md-block-container ${isDarkMode ? 'dark' : 'light'}`}
+      style={{
+        backgroundColor: cardBg,
+        borderColor: cardBorder,
+        color: textColor,
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      {isEditing ? (
+        <textarea
+          value={shape.props.text}
+          onChange={(e) => {
+            editor.updateShape({
+              id: shape.id,
+              type: 'markdown',
+              props: { text: e.target.value },
+            });
+          }}
+          onKeyDown={(e) => {
+            // Stop event propagation so keyboard keydown events don't trigger canvas shortcuts (e.g. Backspace deleting shape)
+            e.stopPropagation();
+            if (e.key === 'Escape') {
+              editor.setEditingShape(null);
+            }
+          }}
+          onBlur={() => {
+            editor.setEditingShape(null);
+          }}
+          className="md-textarea"
+          autoFocus
+          placeholder="Write markdown here..."
+        />
+      ) : (
+        shape.props.text.trim() === '' ? (
+          <em style={{ opacity: 0.5, fontSize: '14px' }}>Double-click to edit markdown...</em>
+        ) : (
+          parseMarkdown(shape.props.text)
+        )
+      )}
+    </div>
+  );
+}
+
 export class MarkdownShapeUtil extends BaseBoxShapeUtil<MarkdownShape> {
   static override type = 'markdown' as const;
 
@@ -60,7 +151,6 @@ export class MarkdownShapeUtil extends BaseBoxShapeUtil<MarkdownShape> {
     return true;
   }
 
-
   // Required implementation of abstract member getIndicatorPath for selection highlights
   override getIndicatorPath(shape: MarkdownShape) {
     const path = new Path2D();
@@ -72,14 +162,6 @@ export class MarkdownShapeUtil extends BaseBoxShapeUtil<MarkdownShape> {
   override component(shape: MarkdownShape) {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const isDarkMode = this.editor.user.getIsDarkMode();
-    
-    // Resolve current theme colors based on tldraw theme configurations
-    const theme = DEFAULT_THEME.colors[isDarkMode ? 'dark' : 'light'];
-    const resolvedColor = theme[shape.props.color];
-
-    const textColor = isDarkMode ? '#f1f5f9' : '#0f172a';
-    const cardBg = resolvedColor.semi;
-    const cardBorder = resolvedColor.solid;
 
     return (
       <HTMLContainer
@@ -91,48 +173,12 @@ export class MarkdownShapeUtil extends BaseBoxShapeUtil<MarkdownShape> {
           boxSizing: 'border-box',
         }}
       >
-        <div
-          className={`md-block-container ${isDarkMode ? 'dark' : 'light'}`}
-          style={{
-            backgroundColor: cardBg,
-            borderColor: cardBorder,
-            color: textColor,
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          {isEditing ? (
-            <textarea
-              value={shape.props.text}
-              onChange={(e) => {
-                this.editor.updateShape({
-                  id: shape.id,
-                  type: 'markdown',
-                  props: { text: e.target.value },
-                });
-              }}
-              onKeyDown={(e) => {
-                // Stop event propagation so keyboard keydown events don't trigger canvas shortcuts (e.g. Backspace deleting shape)
-                e.stopPropagation();
-                if (e.key === 'Escape') {
-                  this.editor.setEditingShape(null);
-                }
-              }}
-              onBlur={() => {
-                this.editor.setEditingShape(null);
-              }}
-              className="md-textarea"
-              autoFocus
-              placeholder="Write markdown here..."
-            />
-          ) : (
-            shape.props.text.trim() === '' ? (
-              <em style={{ opacity: 0.5, fontSize: '14px' }}>Double-click to edit markdown...</em>
-            ) : (
-              parseMarkdown(shape.props.text)
-            )
-          )}
-        </div>
+        <MarkdownCard
+          shape={shape}
+          editor={this.editor}
+          isEditing={isEditing}
+          isDarkMode={isDarkMode}
+        />
       </HTMLContainer>
     );
   }
