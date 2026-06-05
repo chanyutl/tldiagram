@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { 
   BaseBoxShapeUtil, 
   DefaultColorStyle, 
@@ -56,6 +56,11 @@ function MarkdownCard({
   const textColor = isDarkMode ? '#f1f5f9' : '#0f172a';
   const cardBg = resolvedColor.semi;
   const cardBorder = resolvedColor.solid;
+
+  // Memoize the parsed Markdown content to avoid re-parsing on every component render
+  const parsedContent = useMemo(() => {
+    return parseMarkdown(shape.props.text);
+  }, [shape.props.text]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -118,7 +123,7 @@ function MarkdownCard({
         shape.props.text.trim() === '' ? (
           <em style={{ opacity: 0.5, fontSize: '14px' }}>Double-click to edit markdown...</em>
         ) : (
-          parseMarkdown(shape.props.text)
+          parsedContent
         )
       )}
     </div>

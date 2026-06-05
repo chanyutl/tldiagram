@@ -328,7 +328,7 @@ export const ConnectionOverlay = track(({ containerRef, arrowColor, arrowDash }:
           const pagePoint = editor.inputs.currentPagePoint;
 
           // Check if cursor is near any of the shape's four corners
-          const zoom = editor.getZoomLevel();
+          const zoom = editor.getEfficientZoomLevel();
           const threshold = 20 / zoom; // 20 screen pixels threshold
 
           const corners = [
