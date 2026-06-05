@@ -54,7 +54,9 @@ export const ConnectionOverlay = track(({ containerRef, arrowColor, arrowDash }:
   // Decide which shape should show its connection pins (when not dragging)
   let targetShapeId: TLShapeId | null = null;
 
-  if (!activeDrag) {
+  const editingShapeId = editor.getEditingShapeId();
+
+  if (!activeDrag && !editingShapeId) {
     if (hoveredShapeId) {
       const shape = editor.getShape(hoveredShapeId);
       if (shape && shape.type === 'geo') {
