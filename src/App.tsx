@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Tldraw, Editor, createShapeId, toRichText } from 'tldraw';
+import { Tldraw, Editor, createShapeId, toRichText, getSnapshot, loadSnapshot } from 'tldraw';
 import 'tldraw/tldraw.css';
 import './App.css';
 import { ConnectionOverlay } from './components/ConnectionOverlay';
@@ -16,8 +16,11 @@ interface Ripple {
 
 function App() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [editor, setEditor] = useState<Editor | null>(null);
   const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [pendingSnapshot, setPendingSnapshot] = useState<any>(null);
   const arrowColor = 'violet';
   const arrowDash = 'solid';
   const [contextMenu, setContextMenu] = useState<{
@@ -136,6 +139,133 @@ function App() {
     editorInstance.focus();
   };
 
+  const handleExport = () => {
+    if (!editor) return;
+    try {
+      const snapshot = getSnapshot(editor.store);
+      const jsonString = JSON.stringify(snapshot, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `diagram-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Export failed:', err);
+      alert('Failed to export diagram.');
+    }
+  };
+
+  const handleImportClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (!json || typeof json !== 'object') {
+          alert('Invalid JSON file.');
+          return;
+        }
+        setPendingSnapshot(json);
+        setIsImportModalOpen(true);
+      } catch (err) {
+        alert('Failed to parse JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleReplaceImport = () => {
+    if (!editor || !pendingSnapshot) return;
+    try {
+      loadSnapshot(editor.store, pendingSnapshot);
+      setIsImportModalOpen(false);
+      setPendingSnapshot(null);
+    } catch (err) {
+      console.error('Import failed:', err);
+      alert('Failed to load snapshot into editor. Make sure it is a valid tldraw diagram file.');
+    }
+  };
+
+  const handleMergeImport = () => {
+    if (!editor || !pendingSnapshot) return;
+    try {
+      let records: any = null;
+      if (pendingSnapshot.store) {
+        records = pendingSnapshot.store;
+      } else if (pendingSnapshot.document && pendingSnapshot.document.store) {
+        records = pendingSnapshot.document.store;
+      } else if (typeof pendingSnapshot === 'object') {
+        records = pendingSnapshot;
+      }
+
+      if (!records) {
+        alert('No valid records found in the import file.');
+        return;
+      }
+
+      const recordsToMerge = Object.values(records).filter(
+        (record: any) =>
+          record &&
+          (record.typeName === 'shape' ||
+           record.typeName === 'binding' ||
+           record.typeName === 'asset')
+      );
+
+      if (recordsToMerge.length === 0) {
+        alert('No mergeable shapes found in the imported file.');
+        return;
+      }
+
+      const currentShapeIds = new Set(
+        Object.values(editor.store.allRecords())
+          .filter((r: any) => r.typeName === 'shape')
+          .map((r: any) => r.id)
+      );
+
+      const hasOverlaps = recordsToMerge.some((r: any) => r.typeName === 'shape' && currentShapeIds.has(r.id));
+
+      const finalRecords = recordsToMerge.map((record: any) => {
+        if (record.typeName === 'shape') {
+          if (hasOverlaps) {
+            return {
+              ...record,
+              x: (record.x || 0) + 40,
+              y: (record.y || 0) + 40,
+            };
+          }
+        }
+        return record;
+      });
+
+      editor.store.put(finalRecords);
+
+      const mergedShapeIds = finalRecords
+        .filter((r: any) => r.typeName === 'shape')
+        .map((r: any) => r.id);
+      
+      if (mergedShapeIds.length > 0) {
+        editor.select(...mergedShapeIds);
+      }
+
+      setIsImportModalOpen(false);
+      setPendingSnapshot(null);
+    } catch (err) {
+      console.error('Merge failed:', err);
+      alert('Failed to merge shapes into editor.');
+    }
+  };
+
 
 
   useEffect(() => {
@@ -207,6 +337,15 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Hidden file input for importing */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept=".json"
+        onChange={handleFileChange}
+      />
+
       {/* Interactive Diagramming Canvas */}
       <main className="canvas-container" ref={containerRef}>
         {/* Click ripples */}
@@ -221,7 +360,11 @@ function App() {
           />
         ))}
 
-        <Tldraw onMount={handleMount} shapeUtils={customShapeUtils}>
+        <Tldraw
+          persistenceKey="happygocoding-tldiagram-document"
+          onMount={handleMount}
+          shapeUtils={customShapeUtils}
+        >
           {/* Pinpoint overlay handles */}
           <ConnectionOverlay
             containerRef={containerRef}
@@ -288,6 +431,81 @@ function App() {
             </div>
             <span className="shortcut">Text</span>
           </button>
+
+          <div className="context-menu-separator" />
+
+          <button
+            className="context-menu-item"
+            onClick={() => {
+              handleExport();
+              setContextMenu(null);
+            }}
+          >
+            <div className="context-menu-item-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="context-menu-icon">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>Export JSON</span>
+            </div>
+            <span className="shortcut">Save</span>
+          </button>
+
+          <button
+            className="context-menu-item"
+            onClick={() => {
+              handleImportClick();
+              setContextMenu(null);
+            }}
+          >
+            <div className="context-menu-item-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="context-menu-icon">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>Import JSON</span>
+            </div>
+            <span className="shortcut">Load</span>
+          </button>
+        </div>
+      )}
+
+      {isImportModalOpen && pendingSnapshot && (
+        <div className="custom-modal-overlay" onPointerDown={() => { setIsImportModalOpen(false); setPendingSnapshot(null); }}>
+          <div className="custom-modal" onPointerDown={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-icon-container">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </div>
+              <h3 className="modal-title">Import Diagram</h3>
+              <p className="modal-description">
+                Choose how you want to load the diagram. You can replace the entire current canvas or merge the shapes into it.
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button className="modal-btn modal-btn-primary" onClick={handleReplaceImport}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                Replace Canvas
+              </button>
+              <button className="modal-btn modal-btn-secondary" onClick={handleMergeImport}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Merge Shapes
+              </button>
+              <button className="modal-btn modal-btn-cancel" onClick={() => { setIsImportModalOpen(false); setPendingSnapshot(null); }}>
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
