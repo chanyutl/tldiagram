@@ -1,73 +1,68 @@
-# React + TypeScript + Vite
+# My Custom tldraw Workspace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+I was searching for a minimal, clean diagramming and flowchart tool to map out designs and notes. I found [tldraw](https://tldraw.dev/), and it was incredibly close to exactly what I wanted. However, to make it fit my daily coding and note-taking workflow perfectly, I needed a few custom tweaks and quality-of-life features.
 
-Currently, two official plugins are available:
+This project is my personal workspace built on top of tldraw engine. It includes a handful of customized behaviors, keyboard shortcuts, and custom shapes that make diagramming feel more integrated for my specific needs.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## The Tweaks I Added
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Here are the custom adjustments I made to adapt tldraw to my personal flow:
 
-## Expanding the ESLint configuration
+### 1. Custom Markdown Cards (`MarkdownShapeUtil`)
+Standard text shapes are great, but I often need structured notes directly on the board.
+* **Formatted Notes**: I added a custom markdown parser supporting headers, bold/italic text, links, bullet lists, tables, and rules.
+* **Copyable Code Blocks**: Code blocks render with a "Copy" button to quickly grab snippets.
+* **Scrolling Inside the Card**: Long markdown cards scroll internally when hovered. This prevents canvas panning/zooming from triggering when I just want to scroll through a text block.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 2. Edge-Aligned Connection Overlay
+Toggling back and forth to the arrow tool felt a bit slow for rapid flowcharting.
+* **Hover-to-Link**: Hovering near any block or markdown card reveals a small violet pin.
+* **Dragging Connections**: Dragging from a pin immediately creates a connector arrow and binds it to the nearest edge of the target shape.
+* **Resizing-Friendly**: The pins automatically hide when the cursor gets close to the corners so that I don't accidentally click a connector pin when trying to resize a shape.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 3. Workflow Shortcuts
+* **Sleek Context Menu**: I set up a `Ctrl + Shift + Left-click` shortcut on empty canvas areas to summon a custom menu right at the cursor. This lets me quickly spawn blocks, markdown cards, labels, or handle file actions.
+* **Ripple Feedback**: Added a gentle ripple animation on click/shortcuts to give me a subtle visual confirmation.
+* **Offset Duplication**: I tweaked `Ctrl + D` / `Cmd + D` to duplicate selected shapes with a `+30px` offset, so the duplicates don't cover the original shapes.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 4. Smart JSON Merge & Import
+Since I import/export diagrams as JSON files frequently:
+* **Merge Option**: Instead of just replacing the entire canvas on import, I added a merge mode. It offsets the imported shapes and automatically selects them so that they don't overlay existing shapes.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Technology Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The project is built on:
+* **Core Canvas**: [tldraw](https://github.com/tldraw/tldraw)
+* **Frontend**: [React 19](https://react.dev/)
+* **Build Tooling**: [Vite](https://vite.dev/) & [TypeScript](https://www.typescriptlang.org/)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## Getting Started
+
+To run the workspace locally:
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Start the local development server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Build the production package**:
+   ```bash
+   npm run build
+   ```
+
+---
+
+## Acknowledgements
+
+A huge thank you to the tldraw team. Their canvas library is exceptionally well-designed and easy to extend.
