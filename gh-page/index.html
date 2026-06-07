@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TLDiagram - Minimalist Custom Diagram Workspace</title>
+  <meta name="description" content="A clean, custom-tailored diagramming and flowchart workspace built on the tldraw engine. Custom markdown shapes, edge-aligned connector pins, and smart JSON imports.">
+  
+  <!-- Preload fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Floating Nav Bar -->
+  <header>
+    <div class="nav-bar">
+      <a href="#" class="logo-link" id="nav-logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M4 4h16v16H4z"/>
+          <path d="M12 4v16M4 12h16"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.15"/>
+        </svg>
+        <span>TLDiagram</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#docs" class="nav-link">Documentation</a>
+        <a href="https://github.com/chanyutl/tldiagram" class="nav-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </nav>
+      <a href="#docs" class="nav-cta" id="nav-get-started">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <span class="eyebrow">Custom tldraw workspace</span>
+          <h1 id="hero-title">Diagramming,<br>refined.</h1>
+          <p class="hero-sub" id="hero-subtitle">
+            A minimalist, keyboard-friendly flowchart and design board tailored for developers. Featuring custom markdown shapes and edge-aligned snapping.
+          </p>
+          <div class="cta-group">
+            <button class="terminal-button" id="copy-clone-cmd" aria-label="Copy clone command">
+              <code>git clone https://github.com/chanyutl/tldiagram.git</code>
+              <span class="terminal-copy-badge">
+                <svg viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </span>
+              <span class="terminal-copy-toast">Copied to Clipboard</span>
+            </button>
+            <a href="#docs" class="btn-secondary" id="hero-docs-cta">
+              Explore Docs
+              <span class="btn-icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Logo Wall -->
+  <section class="logo-wall">
+    <div class="container">
+      <div class="logo-wall-container">
+        <span class="logo-wall-label">Powered by premium open source</span>
+        <div class="logo-grid">
+          <!-- tldraw -->
+          <div class="logo-item" title="tldraw canvas engine">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M12 2L2 22h20L12 2zm0 4l6.5 13H5.5L12 6z"/>
+            </svg>
+            <span>tldraw</span>
+          </div>
+          <!-- React -->
+          <div class="logo-item" title="React 19">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M12 3a9 9 0 0 0-9 9c0 5 9 9 9 9s9-4 9-9a9 9 0 0 0-9-9zm0 15c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"/>
+            </svg>
+            <span>React 19</span>
+          </div>
+          <!-- Vite -->
+          <div class="logo-item" title="Vite">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path d="M2 3h20l-10 18L2 3zm10 3.8L5.7 6l6.3 11.2L18.3 6 12 6.8z"/>
+            </svg>
+            <span>Vite</span>
+          </div>
+          <!-- TypeScript -->
+          <div class="logo-item" title="TypeScript">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <path d="M7 11h4V7H7v4zm6 6h4v-6h-4v6z"/>
+            </svg>
+            <span>TypeScript</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Bento Section -->
+  <section id="features" class="features-section section-padding">
+    <div class="container">
+      <div class="double-bezel" style="background: none; border: none; box-shadow: none; padding: 0;">
+        <span class="eyebrow">Features</span>
+        <h2>Designed to streamline flows</h2>
+        <p class="section-lead">
+          We added crucial features to standard tldraw shapes to better match coding structures, note-taking lists, and layout design.
+        </p>
+      </div>
+
+      <!-- Bento Grid -->
+      <div class="bento-grid">
+        <!-- Markdown shape -->
+        <div class="bento-card col-8">
+          <div>
+            <span class="bento-tag">MarkdownShapeUtil</span>
+            <h3 class="bento-title">Formatted Rich Markdown Cards</h3>
+            <p class="bento-desc">
+              Structured note-taking straight on your canvas. Create tables, bullet points, headers, rules, and code blocks that scroll internally when hovered to prevent background canvas panning.
+            </p>
+          </div>
+          <div class="bento-illustration">
+            <img src="markdown-crad.png" alt="Formatted Rich Markdown Cards" style="width: 100%; height: 100%; object-fit: cover; object-position: top left;">
+          </div>
+        </div>
+
+        <!-- Connection overlay -->
+        <div class="bento-card col-4">
+          <div>
+            <span class="bento-tag">Edge Pinpoints</span>
+            <h3 class="bento-title">Edge-Aligned Links</h3>
+            <p class="bento-desc">
+              Hover near the edge of any block to reveal a white pinpoint, allowing you to drag and create links without switching tools. For alignment, it utilizes tldraw's native snapping behavior out-of-the-box.
+            </p>
+          </div>
+          <div class="bento-illustration">
+            <img src="edge-aligned.png" alt="Edge-Aligned Connection Overlays" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+          </div>
+        </div>
+
+        <!-- Shortcuts -->
+        <div class="bento-card col-4">
+          <div>
+            <span class="bento-tag">Shortcuts</span>
+            <h3 class="bento-title">Workflow Speed</h3>
+            <p class="bento-desc">
+              Instantly summon a custom quick-insert menu right under your cursor with Ctrl + Shift + Click on empty areas. Spawn shapes, notes, and trigger file actions without repetitive trips to the toolbar.
+            </p>
+          </div>
+          <div class="bento-illustration">
+            <img src="context-menu.png" alt="Workflow Shortcuts Context Menu" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+          </div>
+        </div>
+
+        <!-- Smart import -->
+        <div class="bento-card col-8">
+          <div>
+            <span class="bento-tag">JSON Import</span>
+            <h3 class="bento-title">Smart JSON Merge</h3>
+            <p class="bento-desc">
+              Import diagram files without losing your current progress. Merging automatically offsets shapes and groups them under selection, preserving your active canvas layout.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Documentation & Installation Guide -->
+  <section id="docs" class="docs-section section-padding">
+    <div class="container">
+      <div class="double-bezel" style="background: none; border: none; box-shadow: none; padding: 0;">
+        <span class="eyebrow">Developer Guide</span>
+        <h2>Quick Start & Setup</h2>
+        <p class="section-lead">
+          Set up and run your custom diagramming workspace locally on your system in under 2 minutes.
+        </p>
+      </div>
+
+        <!-- Interactive Terminal Panel -->
+        <div class="docs-code-panel">
+          <div class="code-panel-header">
+            <span class="code-panel-title">bash · terminal</span>
+            <div class="code-panel-dots">
+              <span class="code-dot"></span>
+              <span class="code-dot"></span>
+              <span class="code-dot"></span>
+            </div>
+          </div>
+          <pre><code><span class="code-comment"># 1. Clone the project</span>
+git clone https://github.com/chanyutl/tldiagram.git
+<span class="code-keyword">cd</span> tldiagram
+
+<span class="code-comment"># 2. Install package modules</span>
+npm install
+
+<span class="code-comment"># 3. Fire up the local server</span>
+npm run dev</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <a href="#" class="footer-logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4h16v16H4z"/>
+            <path d="M12 4v16M4 12h16"/>
+          </svg>
+          <span>TLDiagram</span>
+        </a>
+        <div class="footer-links">
+          <a href="#features" class="footer-link">Features</a>
+          <a href="#docs" class="footer-link">Docs</a>
+          <a href="https://github.com/chanyutl/tldiagram" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+        <span class="footer-copyright">© 2026 TLDiagram. Built on tldraw.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript logic -->
+  <script>
+    // Copy Command logic
+    const terminalButton = document.getElementById('copy-clone-cmd');
+    if (terminalButton) {
+      terminalButton.addEventListener('click', () => {
+        const textToCopy = 'git clone https://github.com/chanyutl/tldiagram.git';
+        navigator.clipboard.writeText(textToCopy).then(() =>>,StartLine:244,TargetContent: {
+          terminalButton.classList.add('copied');
+          setTimeout(() => {
+            terminalButton.classList.remove('copied');
+          }, 2000);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
