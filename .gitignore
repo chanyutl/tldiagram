@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.agents/skills/brandkit/SKILL.md
+.agents/skills/design-taste-frontend/SKILL.md
+.agents/skills/high-end-visual-design/SKILL.md
+.agents/skills/minimalist-ui/SKILL.md
+.agents/skills/redesign-existing-projects/SKILL.md
+.agents/skills/stitch-design-taste/DESIGN.md
+.agents/skills/stitch-design-taste/SKILL.md
+skills-lock.json

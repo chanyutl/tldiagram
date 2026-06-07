@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://chanyutl.github.io/tldiagram/sitemap.xml
