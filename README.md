@@ -44,7 +44,7 @@ The project is built on:
 
 ## Getting Started
 
-To run the workspace locally:
+### Option A — Node (development)
 
 1. **Install dependencies**:
    ```bash
@@ -60,6 +60,16 @@ To run the workspace locally:
    ```bash
    npm run build
    ```
+
+### Option B — Docker (local container)
+
+Builds the app and serves it via Caddy on port `8080`:
+
+```bash
+docker compose -f docker-compose.local.yml up --build
+```
+
+Then open [http://localhost:8080](http://localhost:8080).
 
 ---
 
