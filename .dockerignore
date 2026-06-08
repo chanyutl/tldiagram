@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.github
+.agents
+.gemini
+.claude
+gh-page
+doc
+skills-lock.json
+README.md
